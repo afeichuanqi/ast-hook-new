@@ -89,19 +89,15 @@
 
     function _search(filedName, pattern, isEquals, isNeedExpansion) {
         const result = [];
-        const expansionValues = isNeedExpansion ? expansionS(pattern) : [pattern];
+        const expansionValues = expansionS(pattern);
         for (let s of stringsDB.varValueDb) {
             let isMatch = false;
             if (typeof pattern === "string") {
-                if (isEquals) {
-                    for (let newPattern of expansionValues) {
-                        isMatch = isMatch || (newPattern === s[filedName]);
-                    }
-                } else {
-                    for (let newPattern of expansionValues) {
-                        isMatch = isMatch || (s[filedName] && s[filedName].indexOf(newPattern) !== -1);
-                    }
-                }
+                for (const newPattern of expansionValues) {
+                    isMatch =
+                      isMatch ||
+                      (`${s.name}---${s.value}`.indexOf(newPattern) !== -1);
+                  }
             } else if (pattern instanceof RegExp) {
                 isMatch = pattern.test(s[filedName]);
             }

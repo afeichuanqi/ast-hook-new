@@ -9,6 +9,7 @@ const 原始文件路径 = "./test.js";
 const 结果保存路径 = "./remove-hook-function-result.js";
 
 
+
 const hookFunctionName = "cc11001100_hook";
 
 const jsCode = fs.readFileSync(原始文件路径).toString();

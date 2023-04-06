@@ -34,15 +34,12 @@ function loadPluginsAsString() {
         "       return;\n" +
         "   }\n" +
         "   window.cc11001100_hook_done = true;\n\n";
-    console.log(fs.readFileSync, 'fs.readFileSync');
-    console.log(path.resolve(__dirname, '../core/hook.js'))
     const hookJsCode = fs.readFileSync(path.resolve(__dirname, '../core/hook.js')).toString();
 
     const pluginsJsContentArray = [];
     //const pluginsBaseDirectory = path.resolve(__dirname, '../plugins');
     for (let pluginName of pluginsNames) {
         const pluginFilePath = path.resolve(__dirname, '../plugins/'+pluginName);
-        console.log(pluginFilePath)
         const pluginJsContent = fs.readFileSync(pluginFilePath).toString();
         pluginsJsContentArray.push(pluginJsContent);
     }

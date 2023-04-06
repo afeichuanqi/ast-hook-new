@@ -7,7 +7,7 @@ const options = {
         enable: true,
         webPort: 8002
     },
-    throttle: 10000,
+    throttle: 1000,
     forceProxyHttps: true,
     wsIntercept: false, // 不开启websocket代理
     silent: false
