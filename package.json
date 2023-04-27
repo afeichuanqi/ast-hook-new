@@ -5,13 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "proxy": "node src/proxy-server/proxy-server.js",
+    "proxy": "nodemon src/proxy-server/proxy-server.js",
     "start": "node src/api-server/api-server.js",
     "generator": "curl https://book.cathaypacific.com/slow-on-What-witnes-this-his-reioy-Why-smiling-t --proxy http://127.0.0.1:10086"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+
+    "anyproxy": "4.1.3",
     "@babel/core": "^7.12.10",
     "@babel/generator": "^7.12.11",
     "@babel/types": "^7.12.12",
@@ -20,6 +22,7 @@
     "express": "^4.17.1",
     "https-proxy-agent": "^5.0.1",
     "jssoup": "0.0.12",
+    "nodemon": "^2.0.22",
     "shelljs": "^0.8.4"
   },
   "devDependencies": {}

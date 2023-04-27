@@ -45,7 +45,7 @@ function process(requestDetail, responseDetail) {
         try {
             processReplaceResponse(requestDetail, responseDetail);
         } catch (error) {
-            console.error(e);
+            console.error(error);
         }
         return ;
     }
@@ -70,6 +70,7 @@ function process(requestDetail, responseDetail) {
 // 进行网页替换
 function processReplaceResponse(requestDetail, responseDetail) {
     responseDetail.response.body = ProxyUtils.matchReplaceUrlResponse(requestDetail.url);
+
 }
 // 判断是否是HTML类型的响应内容
 function isHtmlResponse(responseDetail) {
