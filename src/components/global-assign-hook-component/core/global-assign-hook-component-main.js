@@ -3,6 +3,7 @@ const shell = require("shelljs");
 const crypto = require("crypto");
 const cheerio = require("cheerio");
 const path = require('path')
+const ProxyUtils = require('../../../util/ProxyUtils')
 
 const {loadPluginsAsStringWithCache} = require("./plugins-manager");
 const {injectHook} = require("./inject-hook");
@@ -40,7 +41,14 @@ const disableCache = false;
 })();
 
 function process(requestDetail, responseDetail) {
-
+    if (ProxyUtils.matchReplaceUrl(requestDetail.url)) {
+        try {
+            processReplaceResponse(requestDetail, responseDetail);
+        } catch (error) {
+            console.error(e);
+        }
+        return ;
+    }
     if (isHtmlResponse(responseDetail)) {
         try {
             processHtmlResponse(requestDetail, responseDetail);
@@ -59,7 +67,10 @@ function process(requestDetail, responseDetail) {
         return;
     }
 }
-
+// 进行网页替换
+function processReplaceResponse(requestDetail, responseDetail) {
+    responseDetail.response.body = ProxyUtils.matchReplaceUrlResponse(requestDetail.url);
+}
 // 判断是否是HTML类型的响应内容
 function isHtmlResponse(responseDetail) {
     for (let key in responseDetail.response.header) {
@@ -91,6 +102,7 @@ function processHtmlResponse(requestDetail, responseDetail) {
     if (!scriptArray?.length) {
         return;
     }
+    
     let alreadyInjectHookContext = false;
     for (let script of scriptArray) {
 
@@ -116,13 +128,20 @@ function processHtmlResponse(requestDetail, responseDetail) {
         let newJsCode = injectHook(jsCode);
         // 随着script替换时注入，不创建新的script标签
         if (!alreadyInjectHookContext) {
-            newJsCode = loadPluginsAsStringWithCache() + newJsCode;
+            newJsCode = loadPluginsAsStringWithCache(requestDetail) + newJsCode;
             alreadyInjectHookContext = true;
         }
 
         const newScript = cheerio.load("<script>" + newJsCode + "</script>")("script");
         newScript.attribs = script.attribs;
         $(script).replaceWith(newScript);
+    }
+    // console.log(requestDetail.url)
+    if (ProxyUtils.matchAllowHookCookieUrl(requestDetail.url)) {
+        // 自定义加hookCookie进去
+        const pluginFilePath = path.resolve(__dirname, '../other_hook/Cookie_hook.js');
+        const pluginJsContent = fs.readFileSync(pluginFilePath).toString();
+        $('body').append("<script>" + pluginJsContent + "</script>")
     }
     responseDetail.response.body = $.html();
 }
@@ -151,11 +170,11 @@ function processJavaScriptResponse(requestDetail, responseDetail) {
     // const url = requestDetail.url.split("?")[0];
     const url = requestDetail.url;
     const body = responseDetail.response.body.toString();
-
+    
     if (isNeedIgnoreHook(body)) {
         return;
     }
-
+    // processRealtime(responseDetail, url, body);
     if (disableCache || body.length <= 2000) {
         processRealtime(responseDetail, url, body);
     } else if (injectSuccessJsFileCache.has(url)) {
@@ -176,7 +195,15 @@ function processFromCache(responseDetail, url, body) {
 }
 
 function processRealtime(responseDetail, url, body) {
-    const newJsCode = injectHook(body);
+    let newJsCode = injectHook(body);
+    // console.log(url)
+    // const newJsCode = fs.readFileSync(path.resolve(__dirname, '../../../../../shared-53ba695e3a519ef4ac88af1c1eb12b878c3aabe6.e0f07ee09cf5d2d2ae1a.js')).toString();
+    // console.log(url)
+    // if (url === 'https://static.zhihu.com/heifetz/chunks/shared-53ba695e3a519ef4ac88af1c1eb12b878c3aabe6.e0f07ee09cf5d2d2ae1a.js') {
+    //     // newJsCode = 
+    //     const newJsCode = fs.readFileSync(path.resolve(__dirname, '../../../../../shared-53ba695e3a519ef4ac88af1c1eb12b878c3aabe6.e0f07ee09cf5d2d2ae1a.js')).toString();
+    // }
+    
     const md5 = crypto.createHash("md5");
     const cacheFilePath = injectSuccessJsFileCacheDirectory + "/" + md5.update(url).digest("hex") + ".js";
     const meta = {
@@ -190,6 +217,7 @@ function processRealtime(responseDetail, url, body) {
     }
     injectSuccessJsFileCache.set(url, meta);
     responseDetail.response.body = loadPluginsAsStringWithCache() + newJsCode;
+    // responseDetail.response.body = newJsCode;
 }
 
 function ensureDirectoryExists(directory) {

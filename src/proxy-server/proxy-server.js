@@ -1,4 +1,4 @@
-const AnyProxy = require("anyproxy");
+const AnyProxy = require("../../anyproxy");
 
 const options = {
     port: 10086,
@@ -10,7 +10,7 @@ const options = {
     throttle: 1000,
     forceProxyHttps: true,
     wsIntercept: false, // 不开启websocket代理
-    silent: false
+    silent: true,
 };
 const proxyServer = new AnyProxy.ProxyServer(options);
 

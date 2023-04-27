@@ -12,17 +12,17 @@ let lastReadDiskTs = 0;
 let pluginsJsCodeCache = "";
 
 // 带缓存的读取插件，是为了在支持热加载的情况下尽可能的少读硬盘
-function loadPluginsAsStringWithCache() {
+function loadPluginsAsStringWithCache(requestDetail) {
     // 这是假设访问都是集中在某个时间段的
-    if (new Date().getTime() - lastReadDiskTs <= 1_000) {
+    if (new Date().getTime() - lastReadDiskTs <= 1) {
         return pluginsJsCodeCache;
     }
     lastReadDiskTs = new Date().getTime();
-    return pluginsJsCodeCache = loadPluginsAsString();
+    return pluginsJsCodeCache = loadPluginsAsString(requestDetail);
 }
 
 // 把所有插件加载为 String
-function loadPluginsAsString() {
+function loadPluginsAsString(requestDetail) {
 
     // 用来保证Hook代码只被加载一次
     // TODO 妥善处理Worker环境
@@ -39,10 +39,11 @@ function loadPluginsAsString() {
     const pluginsJsContentArray = [];
     //const pluginsBaseDirectory = path.resolve(__dirname, '../plugins');
     for (let pluginName of pluginsNames) {
-        const pluginFilePath = path.resolve(__dirname, '../plugins/'+pluginName);
+        const pluginFilePath = path.resolve(__dirname, '../plugins/' + pluginName);
         const pluginJsContent = fs.readFileSync(pluginFilePath).toString();
         pluginsJsContentArray.push(pluginJsContent);
     }
+
 
     return "\n// ----------------------------------------- Hook代码开始 ----------------------------------------------------- \n" +
         "\n(() => {\n" +
@@ -60,4 +61,3 @@ function loadPluginsAsString() {
 
 module.exports.loadPluginsAsString = loadPluginsAsString;
 module.exports.loadPluginsAsStringWithCache = loadPluginsAsStringWithCache;
-

@@ -13,6 +13,7 @@
         }
 
         let newJsCode = jsCode;
+        
         const xhr = new XMLHttpRequest();
         xhr.addEventListener("load", () => {
             newJsCode = decodeURIComponent(xhr.responseText);
