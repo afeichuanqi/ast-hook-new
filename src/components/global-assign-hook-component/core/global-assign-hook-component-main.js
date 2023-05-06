@@ -41,7 +41,7 @@ const disableCache = false;
 })();
 
 function process(requestDetail, responseDetail) {
-    if (ProxyUtils.matchReplaceUrl(requestDetail.url)) {
+    if (ProxyUtils.matchReplaceUrl(requestDetail, responseDetail)) {
         try {
             processReplaceResponse(requestDetail, responseDetail);
         } catch (error) {
@@ -69,7 +69,7 @@ function process(requestDetail, responseDetail) {
 }
 // 进行网页替换
 function processReplaceResponse(requestDetail, responseDetail) {
-    responseDetail.response.body = ProxyUtils.matchReplaceUrlResponse(requestDetail.url);
+    responseDetail.response.body = ProxyUtils.matchReplaceUrlResponse(requestDetail, responseDetail);
 
 }
 // 判断是否是HTML类型的响应内容
@@ -138,7 +138,7 @@ function processHtmlResponse(requestDetail, responseDetail) {
         $(script).replaceWith(newScript);
     }
     // console.log(requestDetail.url)
-    if (ProxyUtils.matchAllowHookCookieUrl(requestDetail.url)) {
+    if (ProxyUtils.matchAllowHookCookieUrl(requestDetail, responseDetail)) {
         // 自定义加hookCookie进去
         const pluginFilePath = path.resolve(__dirname, '../other_hook/Cookie_hook.js');
         const pluginJsContent = fs.readFileSync(pluginFilePath).toString();

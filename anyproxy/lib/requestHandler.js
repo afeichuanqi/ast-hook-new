@@ -471,7 +471,6 @@ function getUserReqHandler(userRule, recorder) {
           return responseData;
         } else {
           // TODO: err etimeout
-          console.log(userRule.beforeSendResponse, 'userRule.beforeSendResponse')
           return (yield userRule.beforeSendResponse(Object.assign({}, requestDetail), Object.assign({}, responseData))) || responseData;
         }
       }))
